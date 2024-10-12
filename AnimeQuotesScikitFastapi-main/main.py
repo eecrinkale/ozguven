@@ -3,9 +3,6 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
-from slowapi.errors import RateLimitExceeded
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
 from animeuse import get_closest_quote
 from deep_translator import GoogleTranslator
 import os
@@ -13,11 +10,6 @@ import os
 app = FastAPI(redoc_url=None)
 app.mount("/static", StaticFiles(directory="web"), name="web")
 templates = Jinja2Templates(directory="web")
-
-# Initialize the limiter
-limiter = Limiter(key_func=lambda request: request.query_params.get("key", ""))
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 script_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -39,7 +31,6 @@ async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post("/animequotes")
-@limiter.limit("30/minute")
 async def animequotes_bot(request: Request, msg: str = None, quote_type: str = None):
     if msg is None or quote_type is None:
         raise HTTPException(status_code=400, detail="Missing 'msg' or 'quote_type' parameter.")
