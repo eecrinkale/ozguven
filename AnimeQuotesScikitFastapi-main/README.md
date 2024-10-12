@@ -13,7 +13,7 @@ Technical Details:
 
 
 
-🔍 Artificial Intelligence Model Training:
+ Artificial Intelligence Model Training:
 
 
 
