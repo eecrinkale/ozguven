@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 import random
-from quote import get_closest_quote  # quote.py dosyasındaki fonksiyon
+from quote import get_closest_quote  # Assuming you have this function in quote.py
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -21,21 +21,23 @@ app.add_middleware(
 # Mount static files (CSS, JS)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Template rendering setup (Jinja2)
+# Template rendering setup (HTML)
 templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def get_home(request: Request):
-    """Render the homepage."""
     return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/zivir", response_class=HTMLResponse)
+async def get_home(request: Request):
+    return templates.TemplateResponse("zivir.html", {"request": request})
 
 @app.post("/get_quote/")
 async def get_quote(message: str = Form(...)):
-    """Fetch the closest quote using the get_closest_quote function."""
     if not message:
         raise HTTPException(status_code=400, detail="No message provided")
     
-    # get_closest_quote fonksiyonu çağrılır
+    # Call get_closest_quote function from quote.py
     closest_quote = get_closest_quote(message, n_responses=10)
     
     return {
