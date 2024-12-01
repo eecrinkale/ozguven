@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CESUR-OKUR</title>
+  <!-- CSS Bağlantısı -->
+  <link rel="stylesheet" href="/static/style.css">
+  <!-- Favicon -->
+  <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+  <!-- Iconify Kütüphanesi -->
+  <script src="https://code.iconify.design/iconify-icon/2.0.0/iconify-icon.min.js"></script>
+</head>
+<body>
+  <!-- Arka Plan Resmi -->
+  <img src="/static/background-image.jpeg" alt="Background Image" class="background-image">
+
+  <!-- Ana Uygulama Kapsayıcısı -->
+  <div class="app-container">
+    <header class="header">
+      <h1>CESUR-OKUR</h1>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Temayı Değiştir">
+        <iconify-icon id="theme-icon" icon="line-md:sun-rising-filled-loop"></iconify-icon>
+      </button>
+    </header>
+
+    <div class="main-content">
+      <!-- Mesaj Listesi -->
+      <div class="chat-container">
+        <div class="message-list"></div>
+      </div>
+
+      <!-- Girdi Alanı -->
+      <div class="input-container">
+        <textarea 
+          id="textInput" 
+          name="msg" 
+          placeholder="Hayatınızdaki bir zorluğu tek kelimeyle arayın (örn: aşk, akademik başarı)"
+          onkeydown="handleKeyPress(event)">
+        </textarea>
+        <button onclick="sendMessage()" class="send-button" aria-label="Mesaj Gönder">
+          <iconify-icon icon="gis:search-data"></iconify-icon>
+        </button>
+        <select id="quote-type" class="quote-selector" aria-label="Dil Seçimi">
+          <option value="TR" selected>TR</option>
+          <option value="EN">EN</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Dosyası -->
+  <script src="/static/script.js"></script>
+  <script>
+    // Enter tuşu ile mesaj gönderme
+    function handleKeyPress(event) {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault(); // Yeni satır eklenmesini engelle
+        sendMessage();
+      }
+    }
+
+    // Hata kontrolü (script.js veya style.css yüklenmezse)
+    window.addEventListener('error', (e) => {
+      console.error("Bir dosya yüklenemedi: ", e.target.src || e.target.href);
+    });
+  </script>
+</body>
+</html>
