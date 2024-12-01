@@ -43,21 +43,16 @@ body {
   min-height: 100vh;
   position: relative; /* Butonun kaybolması için gerekli */
 }
-.app-container {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
 
-/* Fotoğrafın yüksekliğini küçültme */
+/* Arka plan resminin düzenlenmesi */
 .background-container {
   position: relative;
-  margin-bottom: 0;  /* Fotoğrafın üzerine yazıyı ve butonu yerleştirebilmek için */
+  margin-bottom: 0;
 }
 
 .background-image {
   width: 100%; /* Genişliği tüm ekranı kaplar */
-  height:500px; /* Yüksekliği 200px olarak ayarladık, ihtiyacınıza göre değiştirin */
+  height: 500px; /* Yüksekliği 500px olarak ayarladık */
   object-fit: cover; /* Görüntüyü düzgün bir şekilde keser */
 }
 
@@ -76,7 +71,7 @@ body {
   z-index: 1; /* Fotoğrafın üzerinde olmasını sağlamak için */
 }
 
-/* Tema Değiştirici Buton - Sayfa sağ üst köşesine yerleştir */
+/* Tema Değiştirici Buton */
 .theme-toggle {
   position: fixed;
   top: 10px;
@@ -88,7 +83,7 @@ body {
   border-radius: 0.25rem;
   cursor: pointer;
   transition: background-color 0.3s, top 0.3s;
-  z-index: 2; /* Butonun yazının ve diğer öğelerin üstünde görünmesini sağlamak */
+  z-index: 2;
 }
 
 .theme-toggle:hover {

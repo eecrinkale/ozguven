@@ -3,34 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CESUR-OKUR</title>
-  <!-- CSS Bağlantısı -->
+  <title>Kendini-OKU</title>
   <link rel="stylesheet" href="/static/style.css">
-  <!-- Favicon -->
   <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
-  <!-- Iconify Kütüphanesi -->
   <script src="https://code.iconify.design/iconify-icon/2.0.0/iconify-icon.min.js"></script>
 </head>
 <body>
-  <!-- Arka Plan Resmi -->
   <img src="/static/background-image.jpeg" alt="Background Image" class="background-image">
-
-  <!-- Ana Uygulama Kapsayıcısı -->
   <div class="app-container">
     <header class="header">
-      <h1>CESUR-OKUR</h1>
+      <h1>Kendini-OKU</h1>
       <button class="theme-toggle" onclick="toggleTheme()" aria-label="Temayı Değiştir">
         <iconify-icon id="theme-icon" icon="line-md:sun-rising-filled-loop"></iconify-icon>
       </button>
     </header>
 
     <div class="main-content">
-      <!-- Mesaj Listesi -->
       <div class="chat-container">
         <div class="message-list"></div>
       </div>
 
-      <!-- Girdi Alanı -->
       <div class="input-container">
         <textarea 
           id="textInput" 
@@ -49,21 +41,62 @@
     </div>
   </div>
 
-  <!-- JavaScript Dosyası -->
   <script src="/static/script.js"></script>
   <script>
-    // Enter tuşu ile mesaj gönderme
     function handleKeyPress(event) {
       if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault(); // Yeni satır eklenmesini engelle
+        event.preventDefault();
         sendMessage();
       }
     }
 
-    // Hata kontrolü (script.js veya style.css yüklenmezse)
-    window.addEventListener('error', (e) => {
-      console.error("Bir dosya yüklenemedi: ", e.target.src || e.target.href);
-    });
+    function sendMessage() {
+      const inputField = document.getElementById('textInput');
+      const inputValue = inputField.value.trim();
+      
+      if (inputValue === '') return;
+
+      const messageList = document.querySelector('.message-list');
+      const userMessage = document.createElement('div');
+      userMessage.classList.add('message', 'user');
+      userMessage.innerText = inputValue;
+      messageList.appendChild(userMessage);
+
+      inputField.value = ''; // input alanını temizle
+
+      fetchQuote(inputValue);
+    }
+
+    async function fetchQuote(inputValue) {
+      const response = await fetch('/get-quote/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ phrase: inputValue })
+      });
+
+      if (!response.ok) {
+        alert("Bir hata oluştu.");
+        return;
+      }
+
+      const data = await response.json();
+      displayQuote(data);
+    }
+
+    function displayQuote(data) {
+      const messageList = document.querySelector('.message-list');
+      const quoteMessage = document.createElement('div');
+      quoteMessage.classList.add('message', 'quote');
+      quoteMessage.innerHTML = `
+        <strong>${data.title}</strong> - ${data.author}<br>
+        ${data.text}<br><br>
+        <strong>Sorular:</strong><br>
+        ${data.questions.map(q => `<p>${q}</p>`).join('')}
+      `;
+      messageList.appendChild(quoteMessage);
+    }
   </script>
 </body>
 </html>

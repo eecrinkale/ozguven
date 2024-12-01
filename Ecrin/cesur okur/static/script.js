@@ -20,7 +20,7 @@ function App() {
 
     try {
       // API isteği gönder
-      const response = await fetch("http://127.0.0.1:8000/get-quote/", {
+      const response = await fetch("http://127.0.0.1:8000", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -119,4 +119,4 @@ function App() {
   );
 }
 
-export default App;
+export default App

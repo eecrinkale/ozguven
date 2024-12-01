@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 import joblib
 import numpy as np
@@ -18,7 +19,7 @@ app.mount("/static", StaticFiles(directory=static_path), name="static")
 # CORS middleware ekleyelim
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Gerekirse sadece belirli bir frontend adresini ekleyin
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -64,7 +65,12 @@ def get_quote(input_phrase: InputPhrase):
     }
     return response
 
-# Ana endpoint
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to the API!"}
+# Ana endpoint (index.html'i döndürme)
+@app.get("/", response_class=HTMLResponse)
+def serve_index():
+    index_path = os.path.join(static_path, "index.html")
+    if not os.path.exists(index_path):
+        raise HTTPException(status_code=404, detail="index.html dosyası bulunamadı.")
+    with open(index_path, "r", encoding="utf-8") as file:
+        html_content = file.read()
+    return HTMLResponse(content=html_content)
