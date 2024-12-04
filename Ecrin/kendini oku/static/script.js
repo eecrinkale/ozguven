@@ -118,5 +118,35 @@ function App() {
     </div>
   );
 }
+// Initialize the theme
+function initializeTheme() {
+  if (!document.body.classList.contains("dark-mode")) {
+      toggleTheme();
+  }
+}
 
+// Toggle the theme
+function toggleTheme() {
+  document.body.classList.toggle('dark-mode');
+  document.body.classList.toggle('light-mode');
+  const icon = document.getElementById("theme-icon");
+  if (document.body.classList.contains('dark-mode')) {
+      icon.setAttribute('icon', 'line-md:sun-rising-filled-loop');
+  } else {
+      icon.setAttribute('icon', 'line-md:moon-rising-filled-alt-loop');
+      // Handle keypress events on the text input
+document.getElementById("textInput").addEventListener("keypress", function (e) {
+  if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+  }
+});
+
+// Clear the localStorage on window load
+window.onload = function () {
+  localStorage.clear();
+  initializeTheme();
+};
+  }
+}
 export default App

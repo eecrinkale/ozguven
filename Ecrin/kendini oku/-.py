@@ -41,7 +41,7 @@ class InputPhrase(BaseModel):
     phrase: str
 
 # Endpoint: Alıntı döndürme
-@app.post("/get-quote/")
+@app.post("/get_quote")
 def get_quote(input_phrase: InputPhrase):
     if not input_phrase.phrase.strip():
         raise HTTPException(status_code=400, detail="Lütfen geçerli bir metin girin.")

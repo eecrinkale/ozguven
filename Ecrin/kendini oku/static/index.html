@@ -13,7 +13,7 @@
   <div class="app-container">
     <header class="header">
       <h1>Kendini-OKU</h1>
-      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Temayı Değiştir">
+      <button class="theme-toggle" onclick="toggleTheme()">
         <iconify-icon id="theme-icon" icon="line-md:sun-rising-filled-loop"></iconify-icon>
       </button>
     </header>
@@ -68,7 +68,7 @@
     }
 
     async function fetchQuote(inputValue) {
-      const response = await fetch('/get-quote/', {
+      const response = await fetch('/get_quote', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

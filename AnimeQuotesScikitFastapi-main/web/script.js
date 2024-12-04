@@ -54,7 +54,7 @@ async function sendMessage() {
       }
       scrollToBottom();
 
-      localStorage.setItem(`${quoteType}_${rawText}`, response.message);
+      localStorage.setItem(${quoteType}_${rawText}, response.message);
       lastMessageText = rawText;
       currentThreadId = response.thread_id;
   } catch (error) {
@@ -79,7 +79,7 @@ function createMessageElement(text, type) {
 // Fetch a bot response
 async function fetchBotResponse(url, data, msg = null, key = null, threadId = '', quoteType) {
   const params = new URLSearchParams({ msg, key, thread_id: threadId, quote_type: quoteType });
-  const response = await fetch(`${url}?${params.toString()}`, {
+  const response = await fetch(${url}?${params.toString()}, {
       method: 'POST',
       body: data
   });
