@@ -64,10 +64,10 @@
 
       inputField.value = ''; // input alanını temizle
 
-      fetchQuote(inputValue);
+      fetchQuoteAndOpenTab(inputValue);
     }
 
-    async function fetchQuote(inputValue) {
+    async function fetchQuoteAndOpenTab(inputValue) {
       const response = await fetch('/get_quote', {
         method: 'POST',
         headers: {
@@ -82,20 +82,84 @@
       }
 
       const data = await response.json();
-      displayQuote(data);
+      openNewTabWithQuote(data);
     }
 
-    function displayQuote(data) {
-      const messageList = document.querySelector('.message-list');
-      const quoteMessage = document.createElement('div');
-      quoteMessage.classList.add('message', 'quote');
-      quoteMessage.innerHTML = `
-        <strong>${data.title}</strong> - ${data.author}<br>
-        ${data.text}<br><br>
-        <strong>Sorular:</strong><br>
-        ${data.questions.map(q => `<p>${q}</p>`).join('')}
-      `;
-      messageList.appendChild(quoteMessage);
+    function openNewTabWithQuote(data) {
+      const newTab = window.open('', '_blank');
+
+      newTab.document.write(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>${data.title || "Sonuç"}</title>
+          <style>
+            body {
+              background-color: white;
+              color: black;
+              font-family: Arial, sans-serif;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+              height: 100vh;
+              margin: 0;
+              text-align: center;
+              padding: 20px;
+            }
+            h1 {
+              font-size: 24px;
+              margin-bottom: 20px;
+            }
+            h2 {
+              font-size: 18px;
+              margin-bottom: 10px;
+            }
+            p {
+              font-size: 16px;
+              margin-bottom: 15px;
+              line-height: 1.5;
+            }
+            .question-section {
+              margin-top: 20px;
+              text-align: left;
+              width: 80%;
+            }
+            .question {
+              margin-bottom: 10px;
+            }
+            .answer {
+              margin-bottom: 20px;
+              width: 100%;
+              padding: 10px;
+              font-size: 16px;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>${data.title || "Başlık Yok"}</h1>
+          <h2>${data.author || "Yazar Bilgisi Yok"}</h2>
+          <p>${data.text || "Alıntı metni mevcut değil."}</p>
+          
+          <!-- Soruların listesi burada olacak -->
+          <div class="question-section">
+            ${data.questions.map((question, index) => {
+              return `
+                <div class="question">
+                  <strong>Soru ${index + 1}:</strong> ${question}
+                  <textarea class="answer" placeholder="Cevabınızı yazın..."></textarea>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+        </body>
+        </html>
+      `);
+
+      newTab.document.close();
     }
   </script>
 </body>

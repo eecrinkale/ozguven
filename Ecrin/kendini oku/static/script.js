@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 function App() {
   // State tanımlamaları
@@ -6,6 +6,10 @@ function App() {
   const [quote, setQuote] = useState(null); // API'den gelen alıntı
   const [loading, setLoading] = useState(false); // Yükleme durumu
   const [error, setError] = useState(null); // Hata mesajı
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem("theme") === "dark";
+  });
+  const [answers, setAnswers] = useState([]); // Sorulara verilen cevaplar
 
   // Alıntı fetch etme fonksiyonu
   const fetchQuote = async () => {
@@ -42,10 +46,72 @@ function App() {
     }
   };
 
+  // Tema değiştirme fonksiyonu
+  const toggleTheme = () => {
+    const newTheme = !darkMode;
+    setDarkMode(newTheme);
+    localStorage.setItem("theme", newTheme ? "dark" : "light");
+  };
+
+  // Tema başlangıç kontrolü
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      setDarkMode(true);
+    } else {
+      setDarkMode(false);
+    }
+  }, []);
+
+  // Cevapları güncelleme fonksiyonu
+  const handleAnswerChange = (index, value) => {
+    const updatedAnswers = [...answers];
+    updatedAnswers[index] = value;
+    setAnswers(updatedAnswers);
+  };
+
+  // Gönder butonuna tıklanınca cevapları gönderme fonksiyonu
+  const handleSubmit = () => {
+    console.log("Cevaplar gönderiliyor:", answers);
+    alert("Cevaplarınız gönderildi!");
+    // Burada API'ye gönderme işlemi yapılabilir
+  };
+
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif", maxWidth: "600px", margin: "auto" }}>
-      <h1 style={{ textAlign: "center", color: "#333" }}>Alıntı Bulucu</h1>
-      
+    <div
+      style={{
+        padding: "20px",
+        fontFamily: "Arial, sans-serif",
+        maxWidth: "600px",
+        margin: "auto",
+        backgroundColor: darkMode ? "#333" : "#f9f9f9",
+        color: darkMode ? "#f9f9f9" : "#333",
+        minHeight: "100vh",
+      }}
+    >
+      <header
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <h1 style={{ color: darkMode ? "#f9f9f9" : "#333" }}>Alıntı Bulucu</h1>
+        <button
+          onClick={toggleTheme}
+          style={{
+            padding: "10px",
+            fontSize: "16px",
+            borderRadius: "50%",
+            backgroundColor: "transparent",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          {darkMode ? "🌞" : "🌙"}
+        </button>
+      </header>
+
       {/* Kullanıcı girdisi */}
       <div style={{ marginBottom: "20px", textAlign: "center" }}>
         <input
@@ -100,19 +166,55 @@ function App() {
             border: "1px solid #ddd",
             padding: "20px",
             borderRadius: "5px",
-            backgroundColor: "#f9f9f9",
+            backgroundColor: darkMode ? "#444" : "#f9f9f9",
           }}
         >
-          <h2 style={{ marginBottom: "10px", color: "#333" }}>Alıntı:</h2>
+          <h2 style={{ marginBottom: "10px", color: darkMode ? "#f9f9f9" : "#333" }}>Alıntı:</h2>
           <p><strong>Başlık:</strong> {quote.title}</p>
           <p><strong>Yazar:</strong> {quote.author}</p>
           <p><strong>Metin:</strong> {quote.text}</p>
-          <h3 style={{ marginTop: "20px", color: "#555" }}>İlgili Sorular:</h3>
+
+          {/* Sorular */}
+          <h3 style={{ marginTop: "20px", color: darkMode ? "#f9f9f9" : "#555" }}>İlgili Sorular:</h3>
           <ul style={{ paddingLeft: "20px" }}>
             {quote.questions.map((q, index) => (
-              <li key={index} style={{ marginBottom: "10px" }}>{q}</li>
+              <li key={index} style={{ marginBottom: "10px", color: darkMode ? "#f9f9f9" : "#333" }}>
+                {q}
+                <div style={{ marginTop: "10px" }}>
+                  <textarea
+                    placeholder={`Cevabınızı yazın...`}
+                    value={answers[index] || ""}
+                    onChange={(e) => handleAnswerChange(index, e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      borderRadius: "5px",
+                      border: "1px solid #ccc",
+                      marginBottom: "10px",
+                      backgroundColor: darkMode ? "#333" : "#fff",
+                      color: darkMode ? "#f9f9f9" : "#333",
+                    }}
+                  ></textarea>
+                </div>
+              </li>
             ))}
           </ul>
+
+          {/* Gönder Butonu */}
+          <button
+            style={{
+              padding: "10px 20px",
+              fontSize: "16px",
+              borderRadius: "5px",
+              backgroundColor: "#28a745",
+              color: "white",
+              border: "none",
+              cursor: "pointer",
+            }}
+            onClick={handleSubmit}
+          >
+            Gönder
+          </button>
         </div>
       )}
     </div>
@@ -147,6 +249,7 @@ window.onload = function () {
   localStorage.clear();
   initializeTheme();
 };
+
+export default App
   }
 }
-export default App
