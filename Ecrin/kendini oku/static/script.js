@@ -60,18 +60,22 @@ function App() {
     updatedAnswers[index] = value;
     setAnswers(updatedAnswers);
   };
-
-  // Gönder butonuna tıklanınca cevapları gönderme fonksiyonu
   const handleSubmit = () => {
+    // Cevaplar arasında boş olanları kontrol et
+    if (answers.some(answer => answer.trim() === "")) {
+      setError("Lütfen tüm sorulara cevap verin.");
+      return; // Cevaplar eksikse işlem yapma
+    }
+  
     const answerData = answers.map((answer, index) => ({
       questionIndex: index,
       answer: answer.trim(),
     }));
     console.log("Cevaplar gönderiliyor:", answerData);
-
+  
     // Cevaplar başarıyla gönderildiyse kullanıcıya mesaj göster
     setSubmitMessage("Cevaplarınız kaydedildi!");
-
+  
     // Burada API'ye gönderme işlemi yapılabilir
     // fetch('/submit_answers', {
     //   method: 'POST',
@@ -79,7 +83,7 @@ function App() {
     //   body: JSON.stringify({ answers: answerData })
     // });
   };
-
+  // Gönder butonuna tıklanınca cevapları gönderme fonksiyonu
   // Tema başlangıç kontrolü
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
@@ -195,7 +199,7 @@ function App() {
                 {q}
                 <div style={{ marginTop: "10px" }}>
                   <textarea
-                    placeholder={`Cevabınızı yazın...`}
+                    placeholder="Cevabınızı yazın..."
                     value={answers[index] || ""}
                     onChange={(e) => handleAnswerChange(index, e.target.value)}
                     style={{
