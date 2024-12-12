@@ -10,6 +10,7 @@ function App() {
     return localStorage.getItem("theme") === "dark";
   });
   const [answers, setAnswers] = useState([]); // Sorulara verilen cevaplar
+  const [submitMessage, setSubmitMessage] = useState(""); // Cevaplar gönderildi mesajı
 
   // Alıntı fetch etme fonksiyonu
   const fetchQuote = async () => {
@@ -53,16 +54,6 @@ function App() {
     localStorage.setItem("theme", newTheme ? "dark" : "light");
   };
 
-  // Tema başlangıç kontrolü
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      setDarkMode(true);
-    } else {
-      setDarkMode(false);
-    }
-  }, []);
-
   // Cevapları güncelleme fonksiyonu
   const handleAnswerChange = (index, value) => {
     const updatedAnswers = [...answers];
@@ -72,10 +63,32 @@ function App() {
 
   // Gönder butonuna tıklanınca cevapları gönderme fonksiyonu
   const handleSubmit = () => {
-    console.log("Cevaplar gönderiliyor:", answers);
-    alert("Cevaplarınız gönderildi!");
+    const answerData = answers.map((answer, index) => ({
+      questionIndex: index,
+      answer: answer.trim(),
+    }));
+    console.log("Cevaplar gönderiliyor:", answerData);
+
+    // Cevaplar başarıyla gönderildiyse kullanıcıya mesaj göster
+    setSubmitMessage("Cevaplarınız kaydedildi!");
+
     // Burada API'ye gönderme işlemi yapılabilir
+    // fetch('/submit_answers', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ answers: answerData })
+    // });
   };
+
+  // Tema başlangıç kontrolü
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      setDarkMode(true);
+    } else {
+      setDarkMode(false);
+    }
+  }, []);
 
   return (
     <div
@@ -202,6 +215,8 @@ function App() {
 
           {/* Gönder Butonu */}
           <button
+            id="submit-button"
+            onClick={handleSubmit}
             style={{
               padding: "10px 20px",
               fontSize: "16px",
@@ -211,38 +226,21 @@ function App() {
               border: "none",
               cursor: "pointer",
             }}
-            onClick={handleSubmit}
           >
             Gönder
           </button>
+
+          {/* Cevaplar gönderildi mesajı */}
+          {submitMessage && (
+            <p style={{ marginTop: "20px", textAlign: "center", color: "green" }}>
+              {submitMessage}
+            </p>
+          )}
         </div>
       )}
     </div>
   );
 }
-// Initialize the theme
-function initializeTheme() {
-  if (!document.body.classList.contains("dark-mode")) {
-      toggleTheme();
-  }
-}
-
-// Toggle the theme
-function toggleTheme() {
-  document.body.classList.toggle('dark-mode');
-  document.body.classList.toggle('light-mode');
-  const icon = document.getElementById("theme-icon");
-  if (document.body.classList.contains('dark-mode')) {
-      icon.setAttribute('icon', 'line-md:sun-rising-filled-loop');
-  } else {
-      icon.setAttribute('icon', 'line-md:moon-rising-filled-alt-loop');
-      // Handle keypress events on the text input
-document.getElementById("textInput").addEventListener("keypress", function (e) {
-  if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-  }
-});
 
 // Clear the localStorage on window load
 window.onload = function () {
@@ -250,6 +248,4 @@ window.onload = function () {
   initializeTheme();
 };
 
-export default App
-  }
-}
+export default App;
