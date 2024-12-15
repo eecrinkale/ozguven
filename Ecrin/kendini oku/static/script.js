@@ -40,6 +40,7 @@ function App() {
       // Yanıtı JSON olarak al
       const data = await response.json();
       setQuote(data); // Gelen alıntıyı state'e ata
+      setAnswers(new Array(data.questions.length).fill("")); // Sorular için boş cevap alanları oluştur
     } catch (err) {
       setError("Bir hata oluştu: " + err.message);
     } finally {
@@ -60,30 +61,23 @@ function App() {
     updatedAnswers[index] = value;
     setAnswers(updatedAnswers);
   };
+
+  // Gönder butonuna tıklanınca cevapları kontrol etme ve gönderme fonksiyonu
   const handleSubmit = () => {
-    // Cevaplar arasında boş olanları kontrol et
-    if (answers.some(answer => answer.trim() === "")) {
+    if (answers.some((answer) => answer.trim() === "")) {
       setError("Lütfen tüm sorulara cevap verin.");
       return; // Cevaplar eksikse işlem yapma
     }
-  
+
     const answerData = answers.map((answer, index) => ({
       questionIndex: index,
       answer: answer.trim(),
     }));
+
     console.log("Cevaplar gönderiliyor:", answerData);
-  
-    // Cevaplar başarıyla gönderildiyse kullanıcıya mesaj göster
     setSubmitMessage("Cevaplarınız kaydedildi!");
-  
-    // Burada API'ye gönderme işlemi yapılabilir
-    // fetch('/submit_answers', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ answers: answerData })
-    // });
   };
-  // Gönder butonuna tıklanınca cevapları gönderme fonksiyonu
+
   // Tema başlangıç kontrolü
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
@@ -186,16 +180,29 @@ function App() {
             backgroundColor: darkMode ? "#444" : "#f9f9f9",
           }}
         >
-          <h2 style={{ marginBottom: "10px", color: darkMode ? "#f9f9f9" : "#333" }}>Alıntı:</h2>
-          <p><strong>Başlık:</strong> {quote.title}</p>
-          <p><strong>Yazar:</strong> {quote.author}</p>
-          <p><strong>Metin:</strong> {quote.text}</p>
+          <h2 style={{ marginBottom: "10px", color: darkMode ? "#f9f9f9" : "#333" }}>
+            Alıntı:
+          </h2>
+          <p>
+            <strong>Başlık:</strong> {quote.title}
+          </p>
+          <p>
+            <strong>Yazar:</strong> {quote.author}
+          </p>
+          <p>
+            <strong>Metin:</strong> {quote.text}
+          </p>
 
           {/* Sorular */}
-          <h3 style={{ marginTop: "20px", color: darkMode ? "#f9f9f9" : "#555" }}>İlgili Sorular:</h3>
+          <h3 style={{ marginTop: "20px", color: darkMode ? "#f9f9f9" : "#555" }}>
+            İlgili Sorular:
+          </h3>
           <ul style={{ paddingLeft: "20px" }}>
             {quote.questions.map((q, index) => (
-              <li key={index} style={{ marginBottom: "10px", color: darkMode ? "#f9f9f9" : "#333" }}>
+              <li
+                key={index}
+                style={{ marginBottom: "10px", color: darkMode ? "#f9f9f9" : "#333" }}
+              >
                 {q}
                 <div style={{ marginTop: "10px" }}>
                   <textarea
@@ -221,14 +228,19 @@ function App() {
           <button
             id="submit-button"
             onClick={handleSubmit}
+            disabled={answers.some((answer) => answer.trim() === "")}
             style={{
               padding: "10px 20px",
               fontSize: "16px",
               borderRadius: "5px",
-              backgroundColor: "#28a745",
+              backgroundColor: answers.some((answer) => answer.trim() === "")
+                ? "#ccc"
+                : "#28a745",
               color: "white",
               border: "none",
-              cursor: "pointer",
+              cursor: answers.some((answer) => answer.trim() === "")
+                ? "not-allowed"
+                : "pointer",
             }}
           >
             Gönder
@@ -245,11 +257,5 @@ function App() {
     </div>
   );
 }
-
-// Clear the localStorage on window load
-window.onload = function () {
-  localStorage.clear();
-  initializeTheme();
-};
 
 export default App;
