@@ -1,21 +1,59 @@
 import React, { useState, useEffect } from "react";
 
 function App() {
-  // State tanımlamaları
-  const [input, setInput] = useState(""); // Kullanıcı girdisi
-  const [quote, setQuote] = useState(null); // API'den gelen alıntı
-  const [loading, setLoading] = useState(false); // Yükleme durumu
-  const [error, setError] = useState(null); // Hata mesajı
+  const [input, setInput] = useState("");
+  const [quote, setQuote] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem("theme") === "dark";
   });
-  const [answers, setAnswers] = useState([]); // Sorulara verilen cevaplar
-  const [submitMessage, setSubmitMessage] = useState(""); // Cevaplar gönderildi mesajı
+  const [answers, setAnswers] = useState([]);
+  const [submitMessage, setSubmitMessage] = useState("");
 
-  // Alıntı fetch etme fonksiyonu
+  // İzin verilen kelimeler listesi
+  const izinliKelimeler = ["takıntı", "özgüven", "zorluk", "eleştiri"];
+
+  // Initialize the theme
+  useEffect(() => {
+    initializeTheme();
+  }, []);
+
+  const initializeTheme = () => {
+    if (darkMode) {
+      document.body.classList.add("dark-mode");
+      document.body.classList.remove("light-mode");
+    } else {
+      document.body.classList.add("light-mode");
+      document.body.classList.remove("dark-mode");
+    }
+  };
+
+  const toggleTheme = () => {
+    const newTheme = !darkMode;
+    setDarkMode(newTheme);
+    localStorage.setItem("theme", newTheme ? "dark" : "light");
+
+    document.body.classList.toggle("dark-mode");
+    document.body.classList.toggle("light-mode");
+
+    const icon = document.getElementById("theme-icon");
+    if (newTheme) {
+      icon.setAttribute("icon", "line-md:sun-rising-filled-loop");
+    } else {
+      icon.setAttribute("icon", "line-md:moon-rising-filled-alt-loop");
+    }
+  };
+
   const fetchQuote = async () => {
     if (!input.trim()) {
       setError("Lütfen bir kelime giriniz.");
+      return;
+    }
+
+    // İzin verilen kelimeler kontrolü
+    if (!izinliKelimeler.includes(input.trim())) {
+      setError("Hata: Geçersiz kelime girdiniz. Lütfen izin verilen bir kelime girin!");
       return;
     }
 
@@ -24,7 +62,6 @@ function App() {
     setQuote(null);
 
     try {
-      // API isteği gönder
       const response = await fetch("http://127.0.0.1:8000", {
         method: "POST",
         headers: {
@@ -37,36 +74,26 @@ function App() {
         throw new Error("API isteği başarısız oldu.");
       }
 
-      // Yanıtı JSON olarak al
       const data = await response.json();
-      setQuote(data); // Gelen alıntıyı state'e ata
-      setAnswers(new Array(data.questions.length).fill("")); // Sorular için boş cevap alanları oluştur
+      setQuote(data);
+      setAnswers(new Array(data.questions.length).fill(""));
     } catch (err) {
       setError("Bir hata oluştu: " + err.message);
     } finally {
-      setLoading(false); // Yükleme durumunu kapat
+      setLoading(false);
     }
   };
 
-  // Tema değiştirme fonksiyonu
-  const toggleTheme = () => {
-    const newTheme = !darkMode;
-    setDarkMode(newTheme);
-    localStorage.setItem("theme", newTheme ? "dark" : "light");
-  };
-
-  // Cevapları güncelleme fonksiyonu
   const handleAnswerChange = (index, value) => {
     const updatedAnswers = [...answers];
     updatedAnswers[index] = value;
     setAnswers(updatedAnswers);
   };
 
-  // Gönder butonuna tıklanınca cevapları kontrol etme ve gönderme fonksiyonu
   const handleSubmit = () => {
     if (answers.some((answer) => answer.trim() === "")) {
       setError("Lütfen tüm sorulara cevap verin.");
-      return; // Cevaplar eksikse işlem yapma
+      return;
     }
 
     const answerData = answers.map((answer, index) => ({
@@ -75,18 +102,8 @@ function App() {
     }));
 
     console.log("Cevaplar gönderiliyor:", answerData);
-    setSubmitMessage("Cevaplarınız kaydedildi!");
+    setSubmitMessage("Cevaplar kaydedildi!");
   };
-
-  // Tema başlangıç kontrolü
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      setDarkMode(true);
-    } else {
-      setDarkMode(false);
-    }
-  }, []);
 
   return (
     <div
@@ -109,6 +126,7 @@ function App() {
       >
         <h1 style={{ color: darkMode ? "#f9f9f9" : "#333" }}>Alıntı Bulucu</h1>
         <button
+          id="theme-icon"
           onClick={toggleTheme}
           style={{
             padding: "10px",
@@ -123,7 +141,6 @@ function App() {
         </button>
       </header>
 
-      {/* Kullanıcı girdisi */}
       <div style={{ marginBottom: "20px", textAlign: "center" }}>
         <input
           type="text"
@@ -155,105 +172,31 @@ function App() {
         </button>
       </div>
 
-      {/* Yükleniyor mesajı */}
-      {loading && (
-        <p style={{ marginTop: "20px", textAlign: "center", color: "#555" }}>
-          Alıntı aranıyor...
-        </p>
-      )}
+      {loading && <p>Alıntı aranıyor...</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {/* Hata mesajı */}
-      {error && (
-        <p style={{ marginTop: "20px", textAlign: "center", color: "red" }}>
-          {error}
-        </p>
-      )}
-
-      {/* Alıntı sonuçları */}
       {quote && (
-        <div
-          style={{
-            marginTop: "20px",
-            border: "1px solid #ddd",
-            padding: "20px",
-            borderRadius: "5px",
-            backgroundColor: darkMode ? "#444" : "#f9f9f9",
-          }}
-        >
-          <h2 style={{ marginBottom: "10px", color: darkMode ? "#f9f9f9" : "#333" }}>
-            Alıntı:
-          </h2>
-          <p>
-            <strong>Başlık:</strong> {quote.title}
-          </p>
-          <p>
-            <strong>Yazar:</strong> {quote.author}
-          </p>
-          <p>
-            <strong>Metin:</strong> {quote.text}
-          </p>
-
-          {/* Sorular */}
-          <h3 style={{ marginTop: "20px", color: darkMode ? "#f9f9f9" : "#555" }}>
-            İlgili Sorular:
-          </h3>
-          <ul style={{ paddingLeft: "20px" }}>
+        <div>
+          <h2>Alıntı:</h2>
+          <p>Başlık: {quote.title}</p>
+          <p>Yazar: {quote.author}</p>
+          <p>Metin: {quote.text}</p>
+          <ul>
             {quote.questions.map((q, index) => (
-              <li
-                key={index}
-                style={{ marginBottom: "10px", color: darkMode ? "#f9f9f9" : "#333" }}
-              >
+              <li key={index}>
                 {q}
-                <div style={{ marginTop: "10px" }}>
-                  <textarea
-                    placeholder="Cevabınızı yazın..."
-                    value={answers[index] || ""}
-                    onChange={(e) => handleAnswerChange(index, e.target.value)}
-                    style={{
-                      width: "100%",
-                      padding: "10px",
-                      borderRadius: "5px",
-                      border: "1px solid #ccc",
-                      marginBottom: "10px",
-                      backgroundColor: darkMode ? "#333" : "#fff",
-                      color: darkMode ? "#f9f9f9" : "#333",
-                    }}
-                  ></textarea>
-                </div>
+                <textarea
+                  value={answers[index] || ""}
+                  onChange={(e) => handleAnswerChange(index, e.target.value)}
+                />
               </li>
             ))}
           </ul>
-
-          {/* Gönder Butonu */}
-          <button
-            id="submit-button"
-            onClick={handleSubmit}
-            disabled={answers.some((answer) => answer.trim() === "")}
-            style={{
-              padding: "10px 20px",
-              fontSize: "16px",
-              borderRadius: "5px",
-              backgroundColor: answers.some((answer) => answer.trim() === "")
-                ? "#ccc"
-                : "#28a745",
-              color: "white",
-              border: "none",
-              cursor: answers.some((answer) => answer.trim() === "")
-                ? "not-allowed"
-                : "pointer",
-            }}
-          >
-            Gönder
-          </button>
-
-          {/* Cevaplar gönderildi mesajı */}
-          {submitMessage && (
-            <p style={{ marginTop: "20px", textAlign: "center", color: "green" }}>
-              {submitMessage}
-            </p>
-          )}
+          <button onClick={handleSubmit}>Gönder</button>
         </div>
       )}
+
+      {submitMessage && <p>{submitMessage}</p>}
     </div>
   );
 }

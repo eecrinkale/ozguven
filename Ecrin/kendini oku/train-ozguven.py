@@ -15,7 +15,7 @@ if not os.path.exists(excel_path):
 data = pd.read_excel(excel_path)
 
 # Beklenen sütunların varlığını kontrol et
-required_columns = {'Title', 'Author', 'Text'}
+required_columns = {'Title', 'Author', 'Text', 'Kelimeler'}
 if not required_columns.issubset(data.columns):
     raise ValueError(f"Beklenen sütunlar {required_columns}, ancak bulunan sütunlar: {set(data.columns)}")
 
@@ -26,7 +26,7 @@ if data.empty:
 
 # Verinin başına göz atma
 print("Veri örnekleri:")
-print(data[['Title', 'Author', 'Text']].head())
+print(data[['Title', 'Author', 'Text', 'Kelimeler']].head())
 
 # TF-IDF vektörleştirici
 vectorizer = TfidfVectorizer(stop_words='english', max_features=10000)

@@ -1,62 +1,45 @@
-import joblib
-import numpy as np
 import pandas as pd
 
-# Kaydedilmiş model ve vektörleyiciyi yükleme
-def load_resources(resources_path):
-    resources = joblib.load(resources_path)
-    return resources['model'], resources['vectorizer'], resources['data']
+# Geçerli kelimeler listesini yüklemek için
+valid_words = pd.read_excel("quotes.xlsx")['Kelimeler'].dropna().apply(lambda x: str(x).strip().lower()).tolist()
 
-# Kullanıcıdan gelen kelimeye en yakın metni bulma
-def get_closest_quote(input_phrase):
-    resources_path = 'quotes.pkl'  # Kaydedilen modelin yolu
-    model, vectorizer, data = load_resources(resources_path)
+# Geçerli kelimeyi kontrol eden fonksiyon
+def validate_word(word):
+    word = word.strip().lower()  # Kullanıcıdan alınan kelimeyi küçük harfe dönüştür ve boşlukları temizle
+    return word in valid_words  # Kelime listede varsa True, yoksa False döner
 
-    # Kullanıcıdan gelen kelimeyi vektörleştir
-    input_vector = vectorizer.transform([input_phrase])
+# Excel'den kelimeye uygun alıntıyı getirme
+def get_quote_for_word(word):
+    # Excel dosyasındaki veriyi yükle
+    data = pd.read_excel("quotes.xlsx")
 
-    # Cosine similarity ile en yakın komşuları bulma
-    distances, indices = model.kneighbors(input_vector, n_neighbors=5)
+    # Kelimenin olduğu alıntıları tam eşleşme ile kontrol et
+    matching_quotes = data[data['Kelimeler'].str.strip().str.lower() == word]
 
-    # En yakın komşulardan birini seçiyoruz
-    closest_index = indices[0][0]  # En yakın olan metni alıyoruz
+    if matching_quotes.empty:
+        return None  # Hiçbir alıntı bulunamazsa None döndür
 
-    closest_quote = data.iloc[closest_index]
+    # Bulunan ilk alıntıyı döndür
+    quote = matching_quotes.iloc[0]
     return {
-        "Title": closest_quote['Title'],
-        "Author": closest_quote['Author'],
-        "Text": closest_quote['Text']
+        "Title": quote['Title'],
+        "Author": quote['Author'],
+        "Text": quote['Text']
     }
-
-# Soruları ekleyen fonksiyon
-def display_questions():
-    questions = [
-        "1. Bu metin size ne ifade ediyor?",
-        "2. Metindeki ana mesajı nasıl yorumlarsınız?",
-        "3. Bu metnin günlük hayatınıza bir katkısı olabilir mi? Eğer evet, nasıl?"
-    ]
-    return questions
 
 # Ana program
 if __name__ == "__main__":
     input_phrase = input("Bir kelime veya ifade girin: ")  # Kullanıcıdan kelime alıyoruz
-    result = get_closest_quote(input_phrase)  # En yakın metni buluyoruz
 
-    # Metni yazdır
-    print(f"Başlık: {result['Title']}")
-    print(f"Yazar: {result['Author']}")
-    print(f"Metin: \"{result['Text']}\"")
+    # Kelimenin geçerli olup olmadığını kontrol et
+    if not validate_word(input_phrase):
+        exit()  # Kelime geçerli değilse hiçbir şey göstermeden çıkış yapar
+    else:
+        # Kelime geçerli, alıntıyı alıyoruz
+        result = get_quote_for_word(input_phrase)
 
-    # Soruları yazdır
-    print("\nLütfen aşağıdaki soruları cevaplayın:")
-    questions = display_questions()
-    for question in questions:
-        print(question)
-
-    # Kullanıcı cevapları
-    print("\nCevaplarınız:")
-    for i, question in enumerate(questions, start=1):
-        answer = input(f"Cevap {i}: ")  # Her soruya kullanıcıdan cevap alıyoruz
-        print(f"Sorunun cevabı {i}: {answer}")  # Kullanıcının verdiği cevapları yazdırıyoruz
- # Kaydetme mesajı
-    print("Cevaplarınız kaydedildi.")
+        if result:  # Eğer bir alıntı bulduysak
+            # Metni yazdır
+            print(f"Başlık: {result['Title']}")
+            print(f"Yazar: {result['Author']}")
+            print(f"Metin: \"{result['Text']}\"")
