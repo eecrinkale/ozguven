@@ -4,8 +4,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 import joblib
-import numpy as np
 import pandas as pd
+import random
 import os
 
 app = FastAPI()
@@ -25,45 +25,67 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Model ve verileri yükleme
+# Model ve veri yükleme
 resources_path = "quotes.pkl"
 if not os.path.exists(resources_path):
     raise FileNotFoundError(f"{resources_path} dosyası bulunamadı.")
 
 def load_resources():
     resources = joblib.load(resources_path)
-    return resources["model"], resources["vectorizer"], resources["data"]
+    return resources["data"]
 
-model, vectorizer, data = load_resources()
+# Veriyi yükleyelim
+data = load_resources()
 
 # Giriş modeli
 class InputPhrase(BaseModel):
     phrase: str
 
+# Alıntı seçme fonksiyonu
+def get_random_quote(input_phrase: str):
+    if not input_phrase.strip():
+        raise ValueError("Girdi boş olamaz.")
+
+    # Kelime eşleşmesine göre filtreleme
+    matching_quotes = data[data['Kelimeler'].str.contains(input_phrase, case=False, na=False)]
+    
+    if not matching_quotes.empty:
+        # Rastgele bir alıntı seçme
+        random_index = random.choice(matching_quotes.index)
+        selected_quote = matching_quotes.loc[random_index]
+        return {
+            "Title": selected_quote['Title'],
+            "Author": selected_quote['Author'],
+            "Text": selected_quote['Text']
+        }
+    else:
+        return None
+
+# Soruları döndüren fonksiyon
+def display_questions():
+    return [
+        "1. Bu metin size ne ifade ediyor?",
+        "2. Metindeki ana mesajı nasıl yorumlarsınız?",
+        "3. Bu metnin günlük hayatınıza bir katkısı olabilir mi? Eğer evet, nasıl?"
+    ]
+
 # Endpoint: Alıntı döndürme
 @app.post("/get_quote")
 def get_quote(input_phrase: InputPhrase):
-    if not input_phrase.phrase.strip():
-        raise HTTPException(status_code=400, detail="Lütfen geçerli bir metin girin.")
-
-    input_vector = vectorizer.transform([input_phrase.phrase])
-    distances, indices = model.kneighbors(input_vector, n_neighbors=5)
-
-    # Rasgele bir alıntı seçme
-    closest_index = np.random.choice(np.array(indices[0]))
-    closest_quote = data.iloc[closest_index]
-
-    response = {
-        "title": closest_quote["Title"],
-        "author": closest_quote["Author"],
-        "text": closest_quote["Text"],
-        "questions": [
-            "Bu metin size ne ifade ediyor?",
-            "Metindeki ana mesajı nasıl yorumlarsınız?",
-            "Bu metnin günlük hayatınıza bir katkısı olabilir mi? Eğer evet, nasıl?"
-        ]
-    }
-    return response
+    try:
+        result = get_random_quote(input_phrase.phrase)
+        if result:
+            response = {
+                "title": result["Title"],
+                "author": result["Author"],
+                "text": result["Text"],
+                "questions": display_questions()
+            }
+            return response
+        else:
+            raise HTTPException(status_code=404, detail="Eşleşen bir alıntı bulunamadı.")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 # Ana endpoint (index.html'i döndürme)
 @app.get("/", response_class=HTMLResponse)

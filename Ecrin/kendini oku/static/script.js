@@ -77,6 +77,7 @@ function App() {
       const data = await response.json();
       setQuote(data);
       setAnswers(new Array(data.questions.length).fill(""));
+
     } catch (err) {
       setError("Bir hata oluştu: " + err.message);
     } finally {
