@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 import joblib
@@ -98,6 +98,10 @@ def submit_answers(answers: AnswersModel):
 @app.get("/", response_class=HTMLResponse)
 def serve_index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/online", response_class=JSONResponse)
+def online(request: Request):
+    return {"status": "online"}
 
 if __name__ == '__main__':
     import uvicorn
