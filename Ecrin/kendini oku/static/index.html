@@ -1,211 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kendini-OKU</title>
-  <link rel="stylesheet" href="/static/styles.css">
-  <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
-  <script src="https://code.iconify.design/iconify-icon/2.0.0/iconify-icon.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/> 
+    <title>Quote Finder</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
 </head>
 <body>
-  <img src="/static/background-image.jpeg" alt="Background Image" class="background-image">
-  <div class="app-container">
-    <header class="header">
-      <h1>Kendini-OKU</h1>
-      <button class="theme-toggle" onclick="toggleTheme()">
-        <iconify-icon id="theme-icon" icon="line-md:sun-rising-filled-loop"></iconify-icon>
-      </button>
-    </header>
+    <div class="background-overlay"></div>
+    <div class="container">
+        <h1>Alıntı Arama</h1>
+        <div class="search-section">
+            <input type="text" id="phraseInput" placeholder="Kelime giriniz..." />
+            <button id="searchBtn">Alıntı Getir</button>
+        </div>
+        
+        <div class="quote-section" id="quoteSection" style="display:none;">
+            <h2 id="quoteTitle"></h2>
+            <p class="author" id="quoteAuthor"></p>
+            <p class="quote-text" id="quoteText"></p>
 
-    <div class="main-content">
-      <div class="chat-container">
-        <div class="message-list"></div>
-      </div>
+            <div id="questionsContainer"></div>
 
-      <div class="input-container">
-        <textarea 
-          id="textInput" 
-          name="msg" 
-          placeholder="Hayatınızdaki bir zorluğu tek kelimeyle arayın (örn: aşk, akademik başarı)"
-          onkeydown="handleKeyPress(event)">
-        </textarea>
-        <button onclick="sendMessage()" class="send-button" aria-label="Mesaj Gönder">
-          <iconify-icon icon="gis:search-data"></iconify-icon>
-        </button>
-        <select id="quote-type" class="quote-selector" aria-label="Dil Seçimi">
-          <option value="TR" selected>TR</option>
-          <option value="EN">EN</option>
-        </select>
-      </div>
+            <div class="answers-section" id="answersSection" style="display:none;">
+                <h3>Cevaplarınızı Giriniz:</h3>
+                <div id="answersForm"></div>
+                <button id="submitAnswersBtn">Cevapları Gönder</button>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <script src="/static/script.js"></script>
-  <script>
-    // Tema kontrolü
-    function initializeTheme() {
-      if (!localStorage.getItem('theme')) {
-        toggleTheme(); // Tema yoksa varsayılan olarak değiştir
-      } else {
-        if (localStorage.getItem('theme') === 'dark') {
-          document.body.classList.add('dark-mode');
-          document.getElementById("theme-icon").setAttribute('icon', 'line-md:sun-rising-filled-loop');
-        } else {
-          document.body.classList.add('light-mode');
-          document.getElementById("theme-icon").setAttribute('icon', 'line-md:moon-rising-filled-alt-loop');
-        }
-      }
-    }
-
-    function toggleTheme() {
-      document.body.classList.toggle('dark-mode');
-      document.body.classList.toggle('light-mode');
-      const icon = document.getElementById("theme-icon");
-      if (document.body.classList.contains('dark-mode')) {
-        localStorage.setItem('theme', 'dark');
-        icon.setAttribute('icon', 'line-md:sun-rising-filled-loop');
-      } else {
-        localStorage.setItem('theme', 'light');
-        icon.setAttribute('icon', 'line-md:moon-rising-filled-alt-loop');
-      }
-    }
-
-    function handleKeyPress(event) {
-      if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        sendMessage();
-      }
-    }
-
-    function sendMessage() {
-      const inputField = document.getElementById('textInput');
-      const inputValue = inputField.value.trim();
-      
-      if (inputValue === '') return;
-
-      const messageList = document.querySelector('.message-list');
-      const userMessage = document.createElement('div');
-      userMessage.classList.add('message', 'user');
-      userMessage.innerText = inputValue;
-      messageList.appendChild(userMessage);
-
-      inputField.value = ''; // input alanını temizle
-
-      fetchQuoteAndOpenTab(inputValue);
-    }
-
-    async function fetchQuoteAndOpenTab(inputValue) {
-      const response = await fetch('/get_quote', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ phrase: inputValue })
-      });
-
-      if (!response.ok) {
-        alert("Bir hata oluştu.");
-        return;
-      }
-
-      const data = await response.json();
-      openNewTabWithQuote(data);
-    }
-
-    function openNewTabWithQuote(data) {
-      const newTab = window.open('', '_blank');
-
-      newTab.document.write(`
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>${data.title || "Sonuç"}</title>
-          <style>
-            body {
-              background-color: white;
-              color: black;
-              font-family: Arial, sans-serif;
-              display: flex;
-              flex-direction: column;
-              justify-content: center;
-              align-items: center;
-              height: 100vh;
-              margin: 0;
-              text-align: center;
-              padding: 20px;
-            }
-            h1 {
-              font-size: 24px;
-              margin-bottom: 20px;
-            }
-            h2 {
-              font-size: 18px;
-              margin-bottom: 10px;
-            }
-            p {
-              font-size: 16px;
-              margin-bottom: 15px;
-              line-height: 1.5;
-            }
-            .question-section {
-              margin-top: 20px;
-              text-align: left;
-              width: 80%;
-            }
-            .question {
-              margin-bottom: 10px;
-            }
-            .answer {
-              margin-bottom: 20px;
-              width: 100%;
-              padding: 10px;
-              font-size: 16px;
-            }
-            button {
-              margin-top: 20px;
-              padding: 10px 20px;
-              font-size: 16px;
-              cursor: pointer;
-              border: none;
-              border-radius: 5px;
-              background-color: #4CAF50;
-              color: white;
-            }
-            button:hover {
-              background-color: #45a049;
-            }
-          </style>
-        </head>
-        <body>
-          <h1>${data.title || "Başlık Yok"}</h1>
-          <h2>${data.author || "Yazar Bilgisi Yok"}</h2>
-          <p>${data.text || "Alıntı metni mevcut değil."}</p>
-          
-          <div class="question-section">
-            ${data.questions.map((question, index) => {
-              return `
-                <div class="question">
-                  <strong>Soru ${index + 1}:</strong> ${question}
-                  <textarea class="answer" placeholder="Cevabınızı yazın..."></textarea>
-                </div>
-              `;
-            }).join('')}
-          </div>
-
-          <!-- Gönder butonu -->
-          <button onclick="alert('Cevaplarınız gönderildi!')">Gönder</button>
-        </body>
-        </html>
-      `);
-
-      newTab.document.close();
-    }
-
-    // Sayfa yüklendiğinde tema ayarlarını yükle
-    window.onload = initializeTheme;
-  </script>
+    <script src="/static/script.js"></script>
 </body>
 </html>

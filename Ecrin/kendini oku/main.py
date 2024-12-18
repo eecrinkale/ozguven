@@ -1,7 +1,8 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 import joblib
 import pandas as pd
@@ -10,47 +11,46 @@ import os
 
 app = FastAPI()
 
-# Static dosyaları sunmak için
-static_path = "static"
-if not os.path.exists(static_path):
-    raise FileNotFoundError(f"{static_path} klasörü bulunamadı.")
-app.mount("/static", StaticFiles(directory=static_path), name="static")
+# Mount static files
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# CORS middleware ekleyelim
+# Jinja2 templates
+templates = Jinja2Templates(directory="static")
+
+# CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # For development only. Restrict in production.
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Model ve veri yükleme
+# Load data
 resources_path = "quotes.pkl"
 if not os.path.exists(resources_path):
-    raise FileNotFoundError(f"{resources_path} dosyası bulunamadı.")
+    raise FileNotFoundError(f"{resources_path} file not found.")
 
 def load_resources():
     resources = joblib.load(resources_path)
     return resources["data"]
 
-# Veriyi yükleyelim
 data = load_resources()
 
-# Giriş modeli
+# Input models
 class InputPhrase(BaseModel):
     phrase: str
 
-# Alıntı seçme fonksiyonu
+class AnswersModel(BaseModel):
+    title: str
+    author: str
+    user_answers: list
+
 def get_random_quote(input_phrase: str):
     if not input_phrase.strip():
-        raise ValueError("Girdi boş olamaz.")
-
-    # Kelime eşleşmesine göre filtreleme
+        raise ValueError("Input phrase cannot be empty.")
     matching_quotes = data[data['Kelimeler'].str.contains(input_phrase, case=False, na=False)]
-    
     if not matching_quotes.empty:
-        # Rastgele bir alıntı seçme
         random_index = random.choice(matching_quotes.index)
         selected_quote = matching_quotes.loc[random_index]
         return {
@@ -61,7 +61,6 @@ def get_random_quote(input_phrase: str):
     else:
         return None
 
-# Soruları döndüren fonksiyon
 def display_questions():
     return [
         "1. Bu metin size ne ifade ediyor?",
@@ -69,7 +68,6 @@ def display_questions():
         "3. Bu metnin günlük hayatınıza bir katkısı olabilir mi? Eğer evet, nasıl?"
     ]
 
-# Endpoint: Alıntı döndürme
 @app.post("/get_quote")
 def get_quote(input_phrase: InputPhrase):
     try:
@@ -83,19 +81,23 @@ def get_quote(input_phrase: InputPhrase):
             }
             return response
         else:
-            raise HTTPException(status_code=404, detail="Eşleşen bir alıntı bulunamadı.")
+            raise HTTPException(status_code=404, detail="No matching quote found.")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-# Ana endpoint (index.html'i döndürme)
+@app.post("/submit_answers")
+def submit_answers(answers: AnswersModel):
+    # In a real scenario, you might save this to a database.
+    print("Received Answers:")
+    print("Title:", answers.title)
+    print("Author:", answers.author)
+    for idx, ans in enumerate(answers.user_answers, start=1):
+        print(f"Answer {idx}: {ans}")
+    return {"status": "success", "message": "Answers received successfully."}
+
 @app.get("/", response_class=HTMLResponse)
-def serve_index():
-    index_path = os.path.join(static_path, "index.html")
-    if not os.path.exists(index_path):
-        raise HTTPException(status_code=404, detail="index.html dosyası bulunamadı.")
-    with open(index_path, "r", encoding="utf-8") as file:
-        html_content = file.read()
-    return HTMLResponse(content=html_content)
+def serve_index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 if __name__ == '__main__':
     import uvicorn

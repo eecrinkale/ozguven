@@ -1,379 +1,145 @@
-:root {
-  /* Temel renkler ve font ayarları */
-  --bg-color: #1e1e1e;
-  --text-color: #d4d4d4;
-  --accent-color: #569cd6;
-  --secondary-color: #4ec9b0;
-  --input-bg-color: #252526;
-  --input-text-color: #d4d4d4;
-  --message-bg-color: #2f2f2f;
-  --message-user-bg-color: #3a3a3a;
-  --shadow-color: rgba(0, 0, 0, 0.3);
-  --font-size-base: 1rem;
-  --font-size-medium: 1.125rem;
-  --font-size-large: 1.25rem;
-  --spacing-base: 2%;
-  --spacing-small: 1%;
-  --spacing-medium: 1.5%;
-  --spacing-large: 3%;
-  --message-max-width: 80%;
-}
-
-.light-mode {
-  /* Aydınlık mod renk ayarları */
-  --bg-color: #f0f0f0;
-  --text-color: #333333;
-  --accent-color: #0077b6;
-  --secondary-color: #007acc;
-  --input-bg-color: #ffffff;
-  --message-bg-color: #ffffff;
-  --message-user-bg-color: #e6e6e6;
-  --shadow-color: rgba(0, 0, 0, 0.1);
-}
-
-body {
+/* Reset some default styles */
+body, html {
   margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  font-size: var(--font-size-base);
-  transition: background-color 0.3s, color 0.3s;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  position: relative; /* Butonun kaybolması için gerekli */
+  padding: 0;
+  height: 100%;
+  font-family: Arial, sans-serif;
+  color: #ffffff;
 }
 
-.app-container {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.background-container {
-  background-image: url('fotoğrafınızın-dosyası.jpg'); /* Fotoğraf yolu */
-  background-size: contain; /* Fotoğrafın tamamını gösterir */
-  background-repeat: no-repeat; /* Fotoğrafın tekrar etmesini engeller */
-  background-position: center; /* Fotoğrafı merkeze hizalar */
-  width: 100%;
-  height: 1000px; /* Konteynerin yüksekliğini ayarlayın */
-}
-
-/* Başlık - Sol üst köşeye yerleştir */
-.header {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  position: absolute;  /* Fotoğrafın üzerine yazıyı yerleştiriyoruz */
-  top: 0;  /* Sol üst köşe */
-  left: 0;
-  padding: var(--spacing-base);
-  background-color: rgba(0, 0, 0, 0.5); /* Arka plana yarı saydam bir renk */
-  color: #fff;  /* Yazıyı beyaz yapalım, fotoğrafın üstünde net görünmesi için */
-  font-size: var(--font-size-large);
-  z-index: 1; /* Fotoğrafın üzerinde olmasını sağlamak için */
-}
-
-/* Tema Değiştirici Buton - Sayfa sağ üst köşesine yerleştir */
-.theme-toggle {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  background-color: var(--accent-color);
-  color: var(--bg-color);
-  border: none;
-  padding: var(--spacing-small) var(--spacing-medium);
-  border-radius: 0.25rem;
-  cursor: pointer;
-  transition: background-color 0.3s, top 0.3s;
-  z-index: 2; /* Butonun yazının ve diğer öğelerin üstünde görünmesini sağlamak */
-}
-
-.theme-toggle:hover {
-  background-color: var(--secondary-color);
-}
-
-/* Ana İçerik */
-.main-content {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Sohbet Kutusu */
-.chat-container {
-  flex-grow: 1;
-  background-color: var(--message-bg-color);
-  padding: var(--spacing-large);
-  overflow-y: auto;
-}
-
-.message-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-small);
-}
-
-.message {
-  padding: var(--spacing-small) var(--spacing-medium);
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  max-width: var(--message-max-width);
-  word-break: break-word;
-}
-
-.message.user {
-  background-color: var(--message-user-bg-color);
-  align-self: flex-end;
-}
-
-.message.bot {
-  background-color: var(--accent-color);
-  color: var(--bg-color);
-  align-self: flex-start;
-}
-
-/* Giriş Alanı */
-.input-container {
-  background-color: var(--input-bg-color);
-  padding: var(--spacing-base);
-  padding-top: 0; 
-  margin-top: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-small);
-  box-shadow: 0 -0.125rem 0.25rem var(--shadow-color);
-}
-
-#textInput {
-  flex-grow: 1;
-  padding: var(--spacing-small);
-  border: none;
-  border-radius: 0.5rem;
-  background-color: var(--input-bg-color);
-  color: var(--input-text-color);
-  font-size: var(--font-size-base);
-  resize: vertical;
-  min-height: 5rem;
-  max-height: 10rem;
-  overflow-y: auto;
-  max-width: 100%;
-}
-:root {
-  /* Temel renkler ve font ayarları */
-  --bg-color: #1e1e1e;
-  --text-color: #d4d4d4;
-  --accent-color: #569cd6;
-  --secondary-color: #4ec9b0;
-  --input-bg-color: #252526;
-  --input-text-color: #d4d4d4;
-  --message-bg-color: #2f2f2f;
-  --message-user-bg-color: #3a3a3a;
-  --shadow-color: rgba(0, 0, 0, 0.3);
-  --font-size-base: 1rem;
-  --font-size-medium: 1.125rem;
-  --font-size-large: 1.25rem;
-  --spacing-base: 2%;
-  --spacing-small: 1%;
-  --spacing-medium: 1.5%;
-  --spacing-large: 3%;
-  --message-max-width: 80%;
-}
-
-.light-mode {
-  /* Aydınlık mod renk ayarları */
-  --bg-color: #f0f0f0;
-  --text-color: #333333;
-  --accent-color: #0077b6;
-  --secondary-color: #007acc;
-  --input-bg-color: #ffffff;
-  --message-bg-color: #ffffff;
-  --message-user-bg-color: #e6e6e6;
-  --shadow-color: rgba(0, 0, 0, 0.1);
-}
-
+/* Background Image with 50% Opacity */
 body {
-  margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  font-size: var(--font-size-base);
-  transition: background-color 0.3s, color 0.3s;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  position: relative; /* Butonun kaybolması için gerekli */
+  position: relative;
+  z-index: 1;
 }
 
-.app-container {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.background-container {
-  background-image: url('fotoğrafınızın-dosyası.jpg'); /* Fotoğraf yolu */
-  background-size: contain; /* Fotoğrafın tamamını gösterir */
-  background-repeat: no-repeat; /* Fotoğrafın tekrar etmesini engeller */
-  background-position: center; /* Fotoğrafı merkeze hizalar */
-  width: 100%;
-  height: 1000px; /* Konteynerin yüksekliğini ayarlayın */
-}
-
-/* Başlık - Sol üst köşeye yerleştir */
-.header {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  position: absolute;  /* Fotoğrafın üzerine yazıyı yerleştiriyoruz */
-  top: 0;  /* Sol üst köşe */
-  left: 0;
-  padding: var(--spacing-base);
-  background-color: rgba(0, 0, 0, 0.5); /* Arka plana yarı saydam bir renk */
-  color: #fff;  /* Yazıyı beyaz yapalım, fotoğrafın üstünde net görünmesi için */
-  font-size: var(--font-size-large);
-  z-index: 1; /* Fotoğrafın üzerinde olmasını sağlamak için */
-}
-
-/* Tema Değiştirici Buton - Sayfa sağ üst köşesine yerleştir */
-.theme-toggle {
+.background-overlay {
   position: fixed;
-  top: 10px;
-  right: 10px;
-  background-color: var(--accent-color);
-  color: var(--bg-color);
-  border: none;
-  padding: var(--spacing-small) var(--spacing-medium);
-  border-radius: 0.25rem;
-  cursor: pointer;
-  transition: background-color 0.3s, top 0.3s;
-  z-index: 2; /* Butonun yazının ve diğer öğelerin üstünde görünmesini sağlamak */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('/static/background-image.jpeg') no-repeat center center fixed;
+  background-size: cover;
+  opacity: 0.5;
+  z-index: -1;
 }
 
-.theme-toggle:hover {
-  background-color: var(--secondary-color);
+/* Container Styling */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.6); /* Semi-transparent background for readability */
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
 }
 
-/* Ana İçerik */
-.main-content {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Sohbet Kutusu */
-.chat-container {
-  flex-grow: 1;
-  background-color: var(--message-bg-color);
-  padding: var(--spacing-large);
-  overflow-y: auto;
-}
-
-.message-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-small);
-}
-
-.message {
-  padding: var(--spacing-small) var(--spacing-medium);
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  max-width: var(--message-max-width);
-  word-break: break-word;
-}
-
-.message.user {
-  background-color: var(--message-user-bg-color);
-  align-self: flex-end;
-}
-
-.message.bot {
-  background-color: var(--accent-color);
-  color: var(--bg-color);
-  align-self: flex-start;
-}
-
-/* Giriş Alanı */
-.input-container {
-  background-color: var(--input-bg-color);
-  padding: var(--spacing-base);
-  padding-top: 0; 
-  margin-top: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-small);
-  box-shadow: 0 -0.125rem 0.25rem var(--shadow-color);
-}
-
-#textInput {
-  flex-grow: 1;
-  padding: var(--spacing-small);
-  border: none;
-  border-radius: 0.5rem;
-  background-color: var(--input-bg-color);
-  color: var(--input-text-color);
-  font-size: var(--font-size-base);
-  resize: vertical;
-  min-height: 5rem;
-  max-height: 10rem;
-  overflow-y: auto;
-  max-width: 100%;
-}
-.submit-button {
-  background-color: var(--accent-color);
-  color: var(--bg-color);
-  border: none;
-  padding: var(--spacing-small) var(--spacing-medium);
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-size: var(--font-size-medium);
+/* Headings */
+h1, h2, h3 {
   text-align: center;
-  margin-top: var(--spacing-large); /* Soruların altında biraz boşluk bırakır */
-  width: 100%; /* Butonun genişliğini tüm satırı kaplayacak şekilde ayarlar */
-  transition: background-color 0.3s;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
 }
 
-.submit-button:hover {
-  background-color: var(--secondary-color);
+/* Search Section */
+.search-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
-
-/* Responsive Tasarım */
-@media (max-width: 768px) {
-  .input-container {
-    flex-direction: column; /* Butonun alt alta yerleşmesini sağlar */
-  }
-
-  #textInput {
-    width: 100%;
-  }
-
-  .chat-container {
-    padding: var(--spacing-base);
-  }
-
-/* Responsive Tasarım */
-@media (max-width: 768px) {
-  .input-container {
-    flex-direction: column; /* Butonun alt alta yerleşmesini sağlar */
-  }
-
-  #textInput {
-    width: 100%;
-  }
-
-  .send-button,
-  .quote-selector {
-    width: 100%;
-  }
+#phraseInput {
+  padding: 10px;
+  font-size: 16px;
+  width: 60%;
+  border: none;
+  border-radius: 4px 0 0 4px;
 }
 
-@media (max-width: 480px) {
-  .header h1 {
-    font-size: var(--font-size-base);
-  }
+#searchBtn {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  background-color: #28a745;
+  color: white;
+  cursor: pointer;
+  border-radius: 0 4px 4px 0;
 }
+
+#searchBtn:hover {
+  background-color: #218838;
+}
+
+/* Quote Section */
+.quote-section {
+  margin-top: 20px;
+}
+
+.author {
+  font-style: italic;
+  text-align: right;
+  margin-bottom: 10px;
+}
+
+.quote-text {
+  font-size: 1.2em;
+  margin-bottom: 20px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+/* Questions Container */
+.question-item {
+  margin-bottom: 10px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+/* Answers Section */
+.answers-section {
+  margin-top: 20px;
+}
+
+.answers-section textarea {
+  width: 100%;
+  height: 60px;
+  padding: 8px;
+  margin-bottom: 15px;
+  border: none;
+  border-radius: 4px;
+  resize: vertical;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  box-shadow: inset 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+#submitAnswersBtn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+#submitAnswersBtn:hover {
+  background-color: #0069d9;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .search-section {
+      flex-direction: column;
+      align-items: center;
+  }
+
+  #phraseInput, #searchBtn {
+      width: 100%;
+      border-radius: 4px;
+  }
+
+  #searchBtn {
+      margin-top: 10px;
+  }
 }
